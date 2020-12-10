@@ -10,7 +10,7 @@ import numpy as np
 tokenizer = Tokenizer()
 data = ""
 
-with open("jonbellion.txt","r") as f:
+with open("lauv.txt","r") as f:
     data = f.read()
 corpus = data.lower().split("\n")
 tokenizer.fit_on_texts(corpus)
@@ -39,19 +39,21 @@ model = Sequential([
 
 model.compile(loss="categorical_crossentropy",optimizer=Adam(lr=0.01),metrics=["accuracy"])
 #earlystop = EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=0, mode='auto')
-history = model.fit(xs, ys, epochs=10, verbose=1)
+history = model.fit(xs, ys, epochs=20, verbose=1)
 
-seed_text = "I've got a bad feeling about this"
+# seed_text = "I've got a bad feeling about this"
 next_words = 100
-  
-for _ in range(next_words):
-	token_list = tokenizer.texts_to_sequences([seed_text])[0]
-	token_list = pad_sequences([token_list], maxlen=max_sequence_len-1, padding='pre')
-	predicted = model.predict_classes(token_list, verbose=0)
-	output_word = ""
-	for word, index in tokenizer.word_index.items():
-		if index == predicted:
-			output_word = word
-			break
-	seed_text += " " + output_word
-print(seed_text)
+phrases = ["need you", "without you","thinking about you","my everything","kiss","love","me","us","we"]
+for seed_text in phrases:
+	for _ in range(next_words):
+		token_list = tokenizer.texts_to_sequences([seed_text])[0]
+		token_list = pad_sequences([token_list], maxlen=max_sequence_len-1, padding='pre')
+		predicted = model.predict_classes(token_list, verbose=0)
+		output_word = ""
+		for word, index in tokenizer.word_index.items():
+			if index == predicted:
+				output_word = word
+				break
+		seed_text += " " + output_word
+	with open("lovetexts.txt","a") as f:
+		f.write(seed_text+"\n\r")
